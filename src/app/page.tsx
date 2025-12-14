@@ -3,7 +3,8 @@
 import { redirect } from "next/navigation";
 
 const page = () => {
-  return redirect("/join-form");
+  return redirect("/dashboard");
 };
 
 export default page;
+  
