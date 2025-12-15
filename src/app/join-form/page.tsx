@@ -1,14 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { X } from "lucide-react"
+import { z } from "zod";
+
 import {
     Form,
     FormControl,
@@ -17,16 +17,17 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import { handleJoinForm } from "@/hooks/useJoinAction";
-import { AlertDialogCancel, AlertDialogContent, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
+import { handleJoinForm } from "@/hooks/useJoinAction";
 
 const JoinSchema = z.object({
     username: z
         .string()
         .min(3, "Username must be at least 3 characters")
-        .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
-
+        .regex(
+            /^[a-zA-Z0-9_]+$/,
+            "Username can only contain letters, numbers, and underscores"
+        ),
     roomId: z.string().min(3, "Room ID must be at least 3 characters"),
 });
 
@@ -75,13 +76,14 @@ export default function JoinForm() {
             res.errors.forEach((issue: any) => {
                 form.setError(issue.path[0], { message: issue.message });
             });
-
             setLoading(false);
             return;
         }
 
         if (!res.success) {
-            form.setError("username", { message: res.error || "Something went wrong" });
+            form.setError("username", {
+                message: res.error || "Something went wrong",
+            });
             setLoading(false);
             return;
         }
@@ -90,149 +92,80 @@ export default function JoinForm() {
     }
 
     return (
-        <div className="">
-            <Card className="relative w-full max-w-lg dark:bg-card shadow-2xl border border-gray-200 dark:border-border">
-                <CardHeader className="relative">
-                    <CardTitle className="text-center font-semibold text-gray-800 dark:text-gray-100">
-                        Join CollabCode
-                    </CardTitle>
+        <CardContent>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="username"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Username</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Your display name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                    {/* <AlertDialogCancel asChild>
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
-                        >
-                            <X className="h-5 w-5" />
-                        </Button>
-                    </AlertDialogCancel> */}
-                    <AlertDialogContent>
-                        <CardHeader className="relative">
-                            <AlertDialogTitle className="text-center font-semibold">
-                                Join CollabCode
-                            </AlertDialogTitle>
+                    <FormField
+                        control={form.control}
+                        name="roomId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Room ID</FormLabel>
 
-                            <AlertDialogCancel asChild>
-                                <Button
-                                    variant="secondary"
-                                    size="icon"
-                                    className="absolute right-4 top-1/2 -translate-y-1/2"
-                                >
-                                    <X className="h-5 w-5" />
-                                </Button>
-                            </AlertDialogCancel>
-                        </CardHeader>
+                                <div className="flex gap-2">
+                                    <FormControl>
+                                        <Input placeholder="Enter or generate room ID" {...field} />
+                                    </FormControl>
 
-                        <JoinForm />
-                    </AlertDialogContent>
-
-                </CardHeader>
-
-
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="username"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="font-semibold text-gray-700 dark:text-gray-300">
-                                            Username
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                placeholder="Your display name"
-                                                className="bg-white dark:bg-background
-                               text-gray-800 dark:text-gray-100
-                               placeholder-gray-400 dark:placeholder-gray-500
-                               border-gray-300 dark:border-border"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="roomId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="font-semibold text-gray-700 dark:text-gray-300">
-                                            Room ID
-                                        </FormLabel>
-
-                                        <div className="flex gap-2">
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    placeholder="Enter or generate room ID"
-                                                    className="bg-white dark:bg-background
-                                 text-gray-800 dark:text-gray-100
-                                 placeholder-gray-400 dark:placeholder-gray-500
-                                 border-gray-300 dark:border-border"
-                                                />
-                                            </FormControl>
-
-                                            <Button
-                                                type="button"
-                                                onClick={generateRoomId}
-                                                className="bg-blue-100 text-blue-700 hover:bg-blue-200
+                                    <Button
+                                        type="button"
+                                        onClick={generateRoomId}
+                                        className="bg-blue-100 text-blue-700 hover:bg-blue-200
                                dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60 cursor-pointer"
-                                            >
-                                                Auto
-                                            </Button>
+                                    >
+                                        Auto
+                                    </Button>
 
-                                            <Button
-                                                type="button"
-                                                onClick={handleCopy}
-                                                disabled={!roomIdValue}
-                                                className="bg-green-100 text-green-700 hover:bg-green-200
+                                    <Button
+                                        type="button"
+                                        onClick={handleCopy}
+                                        disabled={!roomIdValue}
+                                        className="bg-green-100 text-green-700 hover:bg-green-200
                                dark:bg-green-900/40 dark:text-green-300 dark:hover:bg-green-900/60 cursor-pointer"
-                                            >
-                                                {copied ? "Copied!" : "Copy"}
-                                            </Button>
-                                        </div>
+                                    >
+                                        {copied ? "Copied!" : "Copy"}
+                                    </Button>
+                                </div>
 
-                                        <FormMessage />
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                            Share this Room ID to collaborate.
-                                        </p>
-                                    </FormItem>
-                                )}
-                            />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                            <div className="flex gap-2">
-                                <Button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="flex-1 bg-orange-500 text-white hover:bg-orange-600 cursor-pointer"
-                                >
-                                    {loading ? "Joining..." : "Join Room"}
-                                </Button>
+                    <div className="flex gap-2">
+                        <Button type="submit" disabled={loading} className="flex-1">
+                            {loading ? "Joining..." : "Join Room"}
+                        </Button>
 
-                                <Button
-                                    type="button"
-                                    onClick={() => form.reset()}
-                                    className="bg-gray-200 text-gray-800 hover:bg-gray-300
-                         dark:bg-muted dark:text-gray-200 dark:hover:bg-muted/80 cursor-pointer"
-                                >
-                                    Clear
-                                </Button>
-                            </div>
-
-                        </form>
-                    </Form>
-
-                    <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                        <span className="block">Don’t have collaborators?</span>
-                        <span className="block">Generate a Room ID and share it.</span>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => form.reset()}
+                            className="cursor-pointer"
+                        >
+                            Clear
+                        </Button>
                     </div>
-                </CardContent>
-            </Card>
-        </div>
+                </form>
+            </Form>
 
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+                Generate a Room ID and share it with collaborators.
+            </p>
+        </CardContent>
     );
 }

@@ -1,20 +1,16 @@
 "use client"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus, LogIn, History } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { History, LogIn, Plus, X } from "lucide-react"
 
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
 import JoinForm from "../join-form/page"
 
@@ -41,18 +37,30 @@ export default function Dashboard() {
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <AlertDialogHeader>
-                  <Button size="lg" className="rounded-2xl cursor-pointer">
-                    <Plus className="mr-2 h-5 w-5" />
-                    <AlertDialogTitle>Create Room</AlertDialogTitle>
-                  </Button>
-                </AlertDialogHeader>
+                <Button size="lg" className="rounded-2xl">
+                  <Plus className="mr-2 h-5 w-5" />
+                  Create Room
+                </Button>
               </AlertDialogTrigger>
 
-              <AlertDialogContent>
+              <AlertDialogContent className="border border-white py-12">
+                <AlertDialogTitle className="text-center text-lg font-semibold">
+                  Join CollabCode
+                </AlertDialogTitle>
+
+                <AlertDialogCancel asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="absolute right-4 top-5 cursor-pointer"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </AlertDialogCancel>
                 <JoinForm />
               </AlertDialogContent>
             </AlertDialog>
+
           </div>
         </div>
         <Tabs defaultValue="rooms" className="space-y-4">
