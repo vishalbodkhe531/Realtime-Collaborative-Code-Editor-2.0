@@ -24,7 +24,7 @@ export function useRoomActions({ username, roomId, provider, view, language }: U
 
       provider?.awareness.setLocalStateField("user", null);
 
-      router.push("/join-form");
+      router.push("/dashboard");
     } catch (err) {
       console.error("Failed to exit room:", err);
     }

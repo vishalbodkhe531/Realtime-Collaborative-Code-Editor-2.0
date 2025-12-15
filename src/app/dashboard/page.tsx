@@ -5,42 +5,61 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, LogIn, History } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import JoinForm from "../join-form/page"
+
 export default function Dashboard() {
+
+  const handleCreateRoom = () => { }
+
   return (
-    <div className="min-h-screen bg-background p-6 text-foreground">
+    <div className="min-h-screen bg-background p-6 text-foreground ">
       <div className="mx-auto max-w-6xl space-y-6">
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          {/* Left */}
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Codexia</h1>
             <p className="text-sm text-muted-foreground">
               Manage your collaborative coding rooms
             </p>
           </div>
 
-          {/* Right */}
           <div className="flex items-center gap-4">
-            {/* Theme Toggle */}
-            <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
-              <span className="text-sm text-muted-foreground">Theme</span>
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-card p-1 ">
               <ThemeToggle />
             </div>
 
-            {/* Create Room */}
-            <Button size="lg" className="rounded-2xl">
-              <Plus className="mr-2 h-5 w-5" />
-              Create Room
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <AlertDialogHeader>
+                  <Button size="lg" className="rounded-2xl cursor-pointer">
+                    <Plus className="mr-2 h-5 w-5" />
+                    <AlertDialogTitle>Create Room</AlertDialogTitle>
+                  </Button>
+                </AlertDialogHeader>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent>
+                <JoinForm />
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
-
-
         <Tabs defaultValue="rooms" className="space-y-4">
           <TabsList className="rounded-2xl bg-muted">
-            <TabsTrigger value="rooms">My Rooms</TabsTrigger>
-            <TabsTrigger value="join">Join Room</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="rooms" className="cursor-pointer">My Rooms</TabsTrigger>
+            <TabsTrigger value="join" className="cursor-pointer">Join Room</TabsTrigger>
+            <TabsTrigger value="history" className="cursor-pointer">History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="rooms">
@@ -108,3 +127,6 @@ export default function Dashboard() {
     </div>
   )
 }
+
+
+

@@ -7,7 +7,6 @@ export async function POST(req: Request) {
     try {
         await connectDB();
         const { username, roomId } = await req.json();
-
         if (!username || !roomId) {
             return NextResponse.json(
                 { error: "Username and Room ID required" },

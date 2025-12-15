@@ -9,11 +9,11 @@ export function ThemeToggle() {
 
     return (
         <Button
-            variant="ghost"
-            size="icon"
+            variant="secondary"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="rounded-xl"
+            className="rounded-xl cursor-pointer"
         >
+            <span className="">Theme</span>
             <Sun className="h-5 w-5 dark:hidden" />
             <Moon className="h-5 w-5 hidden dark:block" />
         </Button>
