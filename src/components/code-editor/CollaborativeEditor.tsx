@@ -1,22 +1,77 @@
 "use client";
 
-import { cpp } from "@codemirror/lang-cpp";
-import { java } from "@codemirror/lang-java";
-import { javascript } from "@codemirror/lang-javascript";
-import { python } from "@codemirror/lang-python";
+import * as Y from "yjs";
+import { useCallback, useEffect, useState } from "react";
 import { EditorState, Extension, StateEffect } from "@codemirror/state";
+import { EditorView, basicSetup } from "codemirror";
+
+import { javascript } from "@codemirror/lang-javascript";
+import { cpp } from "@codemirror/lang-cpp";
+import { python } from "@codemirror/lang-python";
+import { java } from "@codemirror/lang-java";
+
+import { oneDark } from "@codemirror/theme-one-dark";
+import { yCollab } from "y-codemirror.next";
+
 import { useRoom } from "@liveblocks/react/suspense";
 import { getYjsProviderForRoom } from "@liveblocks/yjs";
-import { EditorView, basicSetup } from "codemirror";
-import { useCallback, useEffect, useState } from "react";
-import { yCollab } from "y-codemirror.next";
-import * as Y from "yjs";
-import { useRoomActions } from "../../hooks/useRoomActions";
+
 import { templates } from "../../data/templates";
+import { useRoomActions } from "../../hooks/useRoomActions";
 
 import { EditorHeader } from "./EditorHeader";
 import { EditorOutput } from "./EditorOutput";
 import { Sidebar } from "./Sidebar";
+
+
+function isDarkMode() {
+  return document.documentElement.classList.contains("dark");
+}
+
+function getLanguageExtension(lang: string): Extension {
+  switch (lang) {
+    case "cpp":
+      return cpp();
+    case "python":
+      return python();
+    case "java":
+      return java();
+    default:
+      return javascript();
+  }
+}
+
+
+const lightEditorTheme = EditorView.theme(
+  {
+    "&": {
+      backgroundColor: "#ffffff",
+      color: "#111827",
+    },
+    ".cm-gutters": {
+      backgroundColor: "#f3f4f6",
+      color: "#6b7280",
+      border: "none",
+    },
+  },
+  { dark: false }
+);
+
+const darkEditorTheme = EditorView.theme(
+  {
+    "&": {
+      backgroundColor: "#0f172a",
+      color: "#e5e7eb",
+    },
+    ".cm-gutters": {
+      backgroundColor: "#020617",
+      color: "#94a3b8",
+      border: "none",
+    },
+  },
+  { dark: true }
+);
+
 
 export function CollaborativeEditor({
   username,
@@ -27,120 +82,106 @@ export function CollaborativeEditor({
 }) {
   const room = useRoom();
   const provider = getYjsProviderForRoom(room);
+
   const [element, setElement] = useState<HTMLElement | null>(null);
+  const [view, setView] = useState<EditorView | null>(null);
   const [yUndoManager, setYUndoManager] = useState<Y.UndoManager | null>(null);
   const [language, setLanguage] = useState("javascript");
-  const [view, setView] = useState<EditorView | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const ref = useCallback((node: HTMLElement | null) => setElement(node), []);
+  const ref = useCallback((node: HTMLElement | null) => {
+    setElement(node);
+  }, []);
+
 
   useEffect(() => {
-    if (!element || !room || !provider) return;
+    if (!element || !provider) return;
+
     const ydoc = provider.getYDoc();
     const ytext = ydoc.getText("codemirror");
+
     const undoManager = new Y.UndoManager(ytext);
     setYUndoManager(undoManager);
 
-    const localState = provider.awareness.getLocalState() as
-      | { user?: { name: string; color: string; picture: string } }
-      | undefined;
-
-    const info =
-      localState?.user ?? {
-        name: username,
-        color: "#" + ((1 << 24) * Math.random() | 0).toString(16),
-        picture: `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`,
-      };
-
     provider.awareness.setLocalStateField("user", {
-      ...info,
+      name: username,
+      color: "#" + ((1 << 24) * Math.random() | 0).toString(16),
+      picture: `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`,
       roomId,
       typing: false,
     });
 
-    let typingTimeout: NodeJS.Timeout;
-
-    const startExtensions: Extension[] = [
+    const extensions: Extension[] = [
       basicSetup,
-      javascript(),
-      yCollab(ytext, provider.awareness, {
-        undoManager,
-        cursorBuilder: (user: any) => {
-          const cursor = document.createElement("span");
-          cursor.style.borderLeft = `2px solid ${user.color || "#ffa500"}`;
-          cursor.style.marginLeft = cursor.style.marginRight = "0px";
-          cursor.style.height = "1em";
+      getLanguageExtension(language),
 
-          const label = document.createElement("div");
-          label.style.position = "absolute";
-          label.style.background = user.color || "#ffa500";
-          label.style.color = "white";
-          label.style.fontSize = "0.7em";
-          label.style.padding = "1px 4px";
-          label.style.borderRadius = "4px";
-          label.style.top = "-1.2em";
-          label.style.left = "0";
-          label.textContent = user.name || "User";
+      ...(isDarkMode() ? [oneDark] : []),
 
-          const wrapper = document.createElement("span");
-          wrapper.style.position = "relative";
-          wrapper.appendChild(cursor);
-          wrapper.appendChild(label);
+      isDarkMode() ? darkEditorTheme : lightEditorTheme,
 
-          return wrapper;
-        },
-      } as any),
-
-      EditorView.updateListener.of((v) => {
-        if (v.docChanged) {
-          const local = provider.awareness.getLocalState() as { user?: any };
-          provider.awareness.setLocalStateField("user", {
-            ...local?.user,
-            typing: true,
-          });
-          clearTimeout(typingTimeout);
-          typingTimeout = setTimeout(() => {
-            const local2 = provider.awareness.getLocalState() as { user?: any };
-            provider.awareness.setLocalStateField("user", {
-              ...local2?.user,
-              typing: false,
-            });
-          }, 1000);
-        }
-      }),
+      yCollab(ytext, provider.awareness, { undoManager }),
     ];
 
     const state = EditorState.create({
       doc: ytext.toString(),
-      extensions: startExtensions,
+      extensions,
     });
 
-    const newView = new EditorView({ state, parent: element });
-    setView(newView);
+    const editor = new EditorView({
+      state,
+      parent: element,
+    });
 
-    return () => {
-      clearTimeout(typingTimeout);
-      newView.destroy();
-    };
-  }, [element, room, username, roomId, provider]);
+    setView(editor);
+
+    return () => editor.destroy();
+  }, [element, provider, username, roomId]);
+
+
+  useEffect(() => {
+    if (!view || !yUndoManager) return;
+
+    const observer = new MutationObserver(() => {
+      view.dispatch({
+        effects: StateEffect.reconfigure.of([
+          basicSetup,
+          getLanguageExtension(language),
+          ...(isDarkMode() ? [oneDark] : []),
+          isDarkMode() ? darkEditorTheme : lightEditorTheme,
+          yCollab(
+            provider.getYDoc().getText("codemirror"),
+            provider.awareness,
+            { undoManager: yUndoManager }
+          ),
+        ]),
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, [view, language, provider, yUndoManager]);
+
 
   const handleLanguageChange = (lang: string) => {
-    if (!lang || !view || !yUndoManager) return;
-    setLanguage(lang);
+    if (!view || !yUndoManager) return;
 
-    let langExt: Extension = javascript();
-    if (lang === "cpp") langExt = cpp();
-    else if (lang === "python") langExt = python();
-    else if (lang === "java") langExt = java();
+    setLanguage(lang);
 
     view.dispatch({
       effects: StateEffect.reconfigure.of([
         basicSetup,
-        langExt,
-        yCollab(provider.getYDoc().getText("codemirror"), provider.awareness, {
-          undoManager: yUndoManager,
-        }),
+        getLanguageExtension(lang),
+        ...(isDarkMode() ? [oneDark] : []),
+        isDarkMode() ? darkEditorTheme : lightEditorTheme,
+        yCollab(
+          provider.getYDoc().getText("codemirror"),
+          provider.awareness,
+          { undoManager: yUndoManager }
+        ),
       ]),
     });
 
@@ -148,6 +189,7 @@ export function CollaborativeEditor({
     ytext.delete(0, ytext.length);
     ytext.insert(0, templates[lang]);
   };
+
 
   const { handleExit, handleRun, isRunning, output } = useRoomActions({
     username,
@@ -163,11 +205,11 @@ export function CollaborativeEditor({
     setTimeout(() => setCopied(false), 1500);
   };
 
-  return (
 
+  return (
     <div className="select-none">
       <div className="flex h-screen w-screen">
-        <div className="flex-1 flex flex-col relative w-full h-full rounded-xl overflow-hidden bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
           <EditorHeader
             yUndoManager={yUndoManager}
@@ -182,7 +224,7 @@ export function CollaborativeEditor({
 
           <div
             ref={ref}
-            className="relative flex-grow overflow-auto p-2 border-b border-gray-700 dark:border-gray-600"
+            className="flex-1 overflow-auto border-b border-gray-300 dark:border-gray-700"
           />
 
           <EditorOutput output={output} />
@@ -195,8 +237,5 @@ export function CollaborativeEditor({
         />
       </div>
     </div>
-
   );
 }
-
-
