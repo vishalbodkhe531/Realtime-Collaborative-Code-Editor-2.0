@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Avatar } from "./Avatar";
+import { TypingIndicator } from "./TypingIndicator";
 
 type Member = {
   name: string;
@@ -14,7 +16,7 @@ type AvatarsProps = {
 };
 
 
-export function Avatars({ currentRoomId, currentUser }: AvatarsProps) {
+export function ExistingUserPanel({ currentRoomId, currentUser }: AvatarsProps) {
   const [members, setMembers] = useState<Member[]>([]);
 
   useEffect(() => {
@@ -38,8 +40,10 @@ export function Avatars({ currentRoomId, currentUser }: AvatarsProps) {
   }, [currentRoomId]);
 
   return (
-    <div className="w-full max-w-xs bg-white p-4 border-l border-gray-300 overflow-auto shadow-sm">
-      <h3 className="text-lg font-semibold mb-3 text-gray-800">Users in Room</h3>
+    <div className="w-full max-w-xs bg-white dark:bg-gray-900 p-4 border-l border-gray-300 dark:border-gray-700 overflow-auto shadow-sm">
+      <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">
+        Users in Room
+      </h3>
 
       <ul className="space-y-3">
         {members.map((user, i) => {
@@ -47,17 +51,26 @@ export function Avatars({ currentRoomId, currentUser }: AvatarsProps) {
           return (
             <li
               key={i}
-              className={`flex items-center gap-3 p-2 rounded-lg transition ${isCurrent
-                ? "bg-gray-50 border border-green-300"
-                : "hover:bg-gray-100"
+              className={`flex items-center gap-3 p-2 rounded-lg transition
+            ${isCurrent
+                  ? "bg-gray-50 dark:bg-gray-800 border border-green-300 dark:border-green-600"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
             >
               <div className="relative">
-                <Avatar picture={user.picture!} name={user.name} isCurrent={isCurrent} />
+                <Avatar
+                  picture={user.picture!}
+                  name={user.name}
+                  isCurrent={isCurrent}
+                />
                 {user.isTyping && <TypingIndicator />}
               </div>
+
               <span
-                className={`text-sm truncate max-w-[120px] ${isCurrent ? "font-semibold text-green-700" : "font-medium text-gray-700"
+                className={`text-sm truncate max-w-[120px]
+              ${isCurrent
+                    ? "font-semibold text-green-700 dark:text-green-400"
+                    : "font-medium text-gray-700 dark:text-gray-300"
                   }`}
               >
                 {user.name} {isCurrent && "(You)"}
@@ -70,29 +83,3 @@ export function Avatars({ currentRoomId, currentUser }: AvatarsProps) {
   );
 }
 
-export function Avatar({
-  picture,
-  name,
-  isCurrent = false,
-}: {
-  picture: string;
-  name: string;
-  isCurrent?: boolean;
-}) {
-  return (
-    <div
-      className={`relative w-10 h-10 rounded-full overflow-hidden border-2 ${isCurrent
-        ? "border-green-400 shadow-md shadow-green-400/50"
-        : "border-gray-400"
-        }`}
-    >
-      <img src={picture} alt={name} className="w-full h-full object-cover" />
-    </div>
-  );
-}
-
-function TypingIndicator() {
-  return (
-    <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-purple-500 rounded-full animate-pulse shadow-lg shadow-purple-500/50"></span>
-  );
-}

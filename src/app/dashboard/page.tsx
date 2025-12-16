@@ -37,13 +37,13 @@ export default function Dashboard() {
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button size="lg" className="rounded-2xl">
+                <Button size="lg" className="rounded-2xl cursor-pointer">
                   <Plus className="mr-2 h-5 w-5" />
                   Create Room
                 </Button>
               </AlertDialogTrigger>
 
-              <AlertDialogContent className="border border-white py-12">
+              <AlertDialogContent className="border py-12 shadow-[0_0_20px_rgba(255,255,255,0.4)]">
                 <AlertDialogTitle className="text-center text-lg font-semibold">
                   Join CollabCode
                 </AlertDialogTitle>

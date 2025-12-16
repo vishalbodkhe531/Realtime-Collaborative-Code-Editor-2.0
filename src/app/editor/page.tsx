@@ -1,6 +1,6 @@
 "use client";
 
-import { CollaborativeEditor } from "@/components/CollaborativeEditor";
+import { CollaborativeEditor } from "@/components/code-editor/CollaborativeEditor";
 import { Room } from "@/utils/Room";
 import React, { useEffect, useState } from "react";
 

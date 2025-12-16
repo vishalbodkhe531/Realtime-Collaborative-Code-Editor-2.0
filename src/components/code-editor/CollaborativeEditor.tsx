@@ -1,28 +1,22 @@
 "use client";
 
-import * as Y from "yjs";
-import { yCollab } from "y-codemirror.next";
-import { EditorView, basicSetup } from "codemirror";
-import { EditorState, Extension, StateEffect } from "@codemirror/state";
-import { javascript } from "@codemirror/lang-javascript";
 import { cpp } from "@codemirror/lang-cpp";
-import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
-import { useCallback, useEffect, useState } from "react";
-import { getYjsProviderForRoom } from "@liveblocks/yjs";
+import { javascript } from "@codemirror/lang-javascript";
+import { python } from "@codemirror/lang-python";
+import { EditorState, Extension, StateEffect } from "@codemirror/state";
 import { useRoom } from "@liveblocks/react/suspense";
-import { Avatars } from "./Avatars";
-import { Button } from "@/components/ui/button";
-import { Toolbar } from "./Toolbar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { templates } from "./templates";
-import { useRoomActions } from "../hooks/useRoomActions";
+import { getYjsProviderForRoom } from "@liveblocks/yjs";
+import { EditorView, basicSetup } from "codemirror";
+import { useCallback, useEffect, useState } from "react";
+import { yCollab } from "y-codemirror.next";
+import * as Y from "yjs";
+import { useRoomActions } from "../../hooks/useRoomActions";
+import { templates } from "../../data/templates";
+
+import { EditorHeader } from "./EditorHeader";
+import { EditorOutput } from "./EditorOutput";
+import { Sidebar } from "./Sidebar";
 
 export function CollaborativeEditor({
   username,
@@ -170,78 +164,39 @@ export function CollaborativeEditor({
   };
 
   return (
+
     <div className="select-none">
       <div className="flex h-screen w-screen">
-        <div className="flex-1 flex flex-col">
-          <div className="flex items-center justify-between p-2 border-b border-black">
-            <Toolbar
-              yUndoManager={yUndoManager}
-              onLanguageChange={handleLanguageChange}
-            />
+        <div className="flex-1 flex flex-col relative w-full h-full rounded-xl overflow-hidden bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
-            <div className="flex items-center space-x-2 bg-gray-100 border border-gray-300 rounded-lg rounded-r-xl pl-4 py-0 text-base text-gray-900 font-mono shadow-sm">
-              <span className="font-semibold">Room ID:</span>
-              <span className="text-lg">{roomId}</span>
-              <button
-                onClick={handleCopy}
-                className={`ml-3 px-6 py-2 text-sm text-white rounded-r-xl cursor-pointer active:scale-95 transition ${copied
-                  ? "bg-green-500 hover:bg-green-600"
-                  : "bg-orange-500 hover:bg-orange-600"
-                  }`}
-              >
-                {copied ? "Copied!" : "Copy"}
-              </button>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium">Language:</label>
-              <Select value={language} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="w-40 cursor-pointer">
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="javascript">JavaScript</SelectItem>
-                  <SelectItem value="cpp">C++</SelectItem>
-                  <SelectItem value="python">Python</SelectItem>
-                  <SelectItem value="java">Java</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Button
-                onClick={handleRun}
-                disabled={isRunning}
-                className="bg-green-500 cursor-pointer text-white hover:bg-green-600"
-              >
-                {isRunning ? "Running..." : "Run Code"}
-              </Button>
-            </div>
-          </div>
+          <EditorHeader
+            yUndoManager={yUndoManager}
+            language={language}
+            roomId={roomId}
+            copied={copied}
+            isRunning={isRunning}
+            onCopy={handleCopy}
+            onRun={handleRun}
+            onLanguageChange={handleLanguageChange}
+          />
 
           <div
             ref={ref}
-            className="flex-1 p-2 overflow-auto border-b border-gray-700"
-          ></div>
+            className="relative flex-grow overflow-auto p-2 border-b border-gray-700 dark:border-gray-600"
+          />
 
-          <div className="h-48 border-t border-gray-400 text-black p-2 font-mono overflow-auto">
-            <div>Output:</div>
-            <pre>{output}</pre>
-          </div>
+          <EditorOutput output={output} />
         </div>
 
-        <div className="flex flex-col w-64 border-l border-gray-300 bg-gray-50">
-          <div className="flex-1 overflow-auto p-2">
-            <Avatars currentRoomId={roomId} currentUser={username} />
-          </div>
-          <div className="p-2 border-t border-gray-300">
-            <Button
-              onClick={handleExit}
-              className="w-full bg-orange-500 cursor-pointer text-white hover:bg-red-600"
-            >
-              Exit Room
-            </Button>
-          </div>
-        </div>
+        <Sidebar
+          roomId={roomId}
+          username={username}
+          onExit={handleExit}
+        />
       </div>
     </div>
+
   );
 }
+
+

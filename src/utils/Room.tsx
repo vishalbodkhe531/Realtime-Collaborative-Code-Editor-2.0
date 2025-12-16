@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { RoomProvider } from "@liveblocks/react/suspense";
 import { ClientSideSuspense } from "@liveblocks/react";
-import { Loading } from "../components/Loading";
+import { Loading } from "../components/code-editor/Loading";
 
 export function Room({ children }: { children: ReactNode }) {
   const [roomId, setRoomId] = useState<string | null>(null);

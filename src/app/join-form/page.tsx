@@ -147,7 +147,7 @@ export default function JoinForm() {
                     />
 
                     <div className="flex gap-2">
-                        <Button type="submit" disabled={loading} className="flex-1">
+                        <Button type="submit" disabled={loading} className="flex-1 cursor-pointer">
                             {loading ? "Joining..." : "Join Room"}
                         </Button>
 
