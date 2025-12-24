@@ -8,8 +8,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Toolbar } from "./Toolbar";
 import { ThemeToggle } from "../ui/theme-toggle";
+import { Toolbar } from "./Toolbar";
 
 interface EditorHeaderProps {
     yUndoManager: any;
@@ -36,7 +36,6 @@ export function EditorHeader({
         <div className="flex items-center justify-between p-2 border-b border-black dark:border-gray-700">
             <Toolbar
                 yUndoManager={yUndoManager}
-                onLanguageChange={onLanguageChange}
             />
 
             <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg rounded-r-xl pl-4 py-0 text-base font-mono shadow-sm">

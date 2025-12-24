@@ -8,14 +8,14 @@ import { EditorOutput } from "./EditorOutput";
 import { Sidebar } from "./Sidebar";
 import { useCollaborativeEditor } from "./data/useCollaborativeEditor";
 
-export function CollaborativeEditor({
-  username,
-  roomId,
-}: {
+type Props = {
   username: string;
   roomId: string;
-}) {
+};
+
+export function CollaborativeEditor({ username, roomId }: Props) {
   const [copied, setCopied] = useState(false);
+  const [showOutput, setShowOutput] = useState(false);
 
   const {
     ref,
@@ -38,6 +38,17 @@ export function CollaborativeEditor({
     setTimeout(() => setCopied(false), 1500);
   };
 
+
+  const handleRunWithOutput = async () => {
+    setShowOutput(true);
+    await handleRun();
+  };
+
+
+  const handleClearOutput = (check: boolean) => {
+    setShowOutput(false);
+  };
+
   return (
     <div className="select-none">
       <div className="flex h-screen w-screen">
@@ -50,7 +61,7 @@ export function CollaborativeEditor({
             copied={copied}
             isRunning={isRunning}
             onCopy={handleCopy}
-            onRun={handleRun}
+            onRun={handleRunWithOutput}
             onLanguageChange={changeLanguage}
           />
 
@@ -59,7 +70,12 @@ export function CollaborativeEditor({
             className="flex-1 overflow-auto border-b border-gray-300 dark:border-gray-700"
           />
 
-          <EditorOutput output={output} />
+          {showOutput && (
+            <EditorOutput
+              output={output}
+              onClear={handleClearOutput}
+            />
+          )}
         </div>
 
         <Sidebar
