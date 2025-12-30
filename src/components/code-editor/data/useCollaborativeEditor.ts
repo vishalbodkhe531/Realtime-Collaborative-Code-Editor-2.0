@@ -7,10 +7,10 @@ import { EditorView, basicSetup } from "codemirror";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { yCollab } from "y-codemirror.next";
 
-import { useRoom } from "@liveblocks/react/suspense";
 import { getYjsProviderForRoom } from "@liveblocks/yjs";
 import { getLanguageExtension, templates } from "./templates";
 import { darkEditorTheme, isDarkMode, lightEditorTheme } from "./editor-theme";
+import { useRoom } from "@liveblocks/react";
 
 
 export function useCollaborativeEditor(
@@ -92,9 +92,7 @@ export function useCollaborativeEditor(
 
     const changeLanguage = (lang: string) => {
         if (!view || !yUndoManager) return;
-
         setLanguage(lang);
-
         view.dispatch({
             effects: StateEffect.reconfigure.of([
                 basicSetup,

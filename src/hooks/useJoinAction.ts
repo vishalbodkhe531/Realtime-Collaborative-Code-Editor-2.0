@@ -1,6 +1,6 @@
-import { JoinInput, joinSchema } from "../validation/joinSchema";
+import { joinFormType, joinSchema } from "../validation/formsValidation";
 
-export const handleJoinForm = async (data: JoinInput) => {
+export const handleJoinForm = async (data: joinFormType) => {
     try {
         const validated = joinSchema.parse(data);
 

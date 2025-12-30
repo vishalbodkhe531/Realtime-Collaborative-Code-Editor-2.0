@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import {
     Form,
@@ -19,27 +18,16 @@ import {
 } from "@/components/ui/form";
 
 import { handleJoinForm } from "@/hooks/useJoinAction";
+import { joinFormType, joinSchema } from "@/validation/formsValidation";
 
-const JoinSchema = z.object({
-    username: z
-        .string()
-        .min(3, "Username must be at least 3 characters")
-        .regex(
-            /^[a-zA-Z0-9_]+$/,
-            "Username can only contain letters, numbers, and underscores"
-        ),
-    roomId: z.string().min(3, "Room ID must be at least 3 characters"),
-});
-
-type JoinValues = z.infer<typeof JoinSchema>;
 
 export default function JoinForm() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
 
-    const form = useForm<JoinValues>({
-        resolver: zodResolver(JoinSchema),
+    const form = useForm<joinFormType>({
+        resolver: zodResolver(joinSchema),
         defaultValues: {
             username: "",
             roomId: "",
@@ -67,7 +55,7 @@ export default function JoinForm() {
         });
     }
 
-    async function onSubmit(values: JoinValues) {
+    async function onSubmit(values: joinFormType) {
         setLoading(true);
 
         const res = await handleJoinForm(values);

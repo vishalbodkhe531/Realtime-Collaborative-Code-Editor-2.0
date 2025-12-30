@@ -15,4 +15,4 @@ export const joinSchema = z.object({
     .refine((val) => !/\s/.test(val), "Room ID cannot contain spaces"), 
 });
 
-export type JoinInput = z.infer<typeof joinSchema>;
+export type joinFormType = z.infer<typeof joinSchema>;

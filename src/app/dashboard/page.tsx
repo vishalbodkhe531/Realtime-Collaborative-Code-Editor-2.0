@@ -60,7 +60,6 @@ export default function Dashboard() {
                 <JoinForm />
               </AlertDialogContent>
             </AlertDialog>
-
           </div>
         </div>
         <Tabs defaultValue="rooms" className="space-y-4">
