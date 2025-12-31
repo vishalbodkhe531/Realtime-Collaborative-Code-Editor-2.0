@@ -16,8 +16,6 @@ import JoinForm from "../join-form/page"
 
 export default function Dashboard() {
 
-  const handleCreateRoom = () => { }
-
   return (
     <div className="min-h-screen bg-background p-6 text-foreground ">
       <div className="mx-auto max-w-6xl space-y-6">

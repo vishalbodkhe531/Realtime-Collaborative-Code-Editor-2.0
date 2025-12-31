@@ -11,6 +11,7 @@ import { getYjsProviderForRoom } from "@liveblocks/yjs";
 import { getLanguageExtension, templates } from "./templates";
 import { darkEditorTheme, isDarkMode, lightEditorTheme } from "./editor-theme";
 import { useRoom } from "@liveblocks/react";
+import { useUserContext } from "@/context/userContext";
 
 
 export function useCollaborativeEditor(
@@ -24,12 +25,13 @@ export function useCollaborativeEditor(
     const [view, setView] = useState<EditorView | null>(null);
     const [yUndoManager, setYUndoManager] = useState<Y.UndoManager | null>(null);
     const [language, setLanguage] = useState("javascript");
+    const { setCode, setLangInContext } = useUserContext();
 
     const ref = useCallback((node: HTMLElement | null) => {
         setElement(node);
     }, []);
 
-    // Initialize editor
+
     useEffect(() => {
         if (!element || !provider) return;
 
@@ -66,6 +68,12 @@ export function useCollaborativeEditor(
     useEffect(() => {
         if (!view || !yUndoManager) return;
 
+        const updateCode = () => {
+            setCode(view.state.doc.toString()); // editor code set in context
+        };
+
+        updateCode(); 
+
         const observer = new MutationObserver(() => {
             view.dispatch({
                 effects: StateEffect.reconfigure.of([
@@ -86,6 +94,8 @@ export function useCollaborativeEditor(
             attributes: true,
             attributeFilter: ["class"],
         });
+
+        setLangInContext(language);
 
         return () => observer.disconnect();
     }, [view, language, provider, yUndoManager]);

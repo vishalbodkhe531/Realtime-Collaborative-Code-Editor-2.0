@@ -18,16 +18,19 @@ import {
 } from "@/components/ui/form";
 
 import { handleJoinForm } from "@/hooks/useJoinAction";
-import { joinFormType, joinSchema } from "@/validation/formsValidation";
+import { joinFormType, joinFormSchema } from "@/validation/formsValidation";
+import { useUserContext } from "@/context/userContext";
 
 
 export default function JoinForm() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
+    const { setUsername, setRoomId } = useUserContext();
+
 
     const form = useForm<joinFormType>({
-        resolver: zodResolver(joinSchema),
+        resolver: zodResolver(joinFormSchema),
         defaultValues: {
             username: "",
             roomId: "",
@@ -75,6 +78,9 @@ export default function JoinForm() {
             setLoading(false);
             return;
         }
+
+        setUsername(values.username);
+        setRoomId(values.roomId);
 
         router.push("/editor");
     }

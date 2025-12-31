@@ -1,8 +1,8 @@
-import { joinFormType, joinSchema } from "../validation/formsValidation";
+import { joinFormType, joinFormSchema } from "../validation/formsValidation";
 
 export const handleJoinForm = async (data: joinFormType) => {
     try {
-        const validated = joinSchema.parse(data);
+        const validated = joinFormSchema.parse(data);
 
         const res = await fetch("/api/join", {
             method: "POST",

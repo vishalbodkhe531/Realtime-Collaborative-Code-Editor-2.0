@@ -1,18 +1,88 @@
-import React from "react";
 import {
     AlertDialog,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogTitle,
     AlertDialogTrigger
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { X } from "lucide-react";
 import { Button } from "../ui/button";
+import { DialogFooter } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { DialogFooter } from "../ui/dialog";
-import { X } from "lucide-react";
+
+import { exitFormSchema, exitFormSchemaType } from "@/validation/formsValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useUserContext } from "@/context/userContext";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+
 
 const ExitForm = () => {
+    const { username, roomId, code, language, resetRoom } = useUserContext();
+    const router = useRouter();
+
+    const form = useForm<exitFormSchemaType>({
+        resolver: zodResolver(exitFormSchema),
+        defaultValues: {
+            fileName: "",
+            description: ""
+        },
+    })
+
+    const onSubmit = async (data: exitFormSchemaType) => {
+        if (!roomId || !username) {
+            toast.error("Missing room data");
+            return;
+        }
+
+        try {
+            const payload = {
+                name: data.fileName,
+                description: data.description,
+                code,
+                language,
+                roomId,
+                username,
+            };
+
+            const res = await fetch("/api/saveFile", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await res.json();
+
+            if (!res.ok || !result.success) {
+                toast.error("Failed to save file");
+                return;
+            }
+
+            toast.success("File saved successfully");
+            resetRoom();
+
+            router.push("/dashboard");
+
+        } catch (error) {
+            toast.error("Network error");
+        }
+    };
+
+
+
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -24,7 +94,7 @@ const ExitForm = () => {
             <AlertDialogContent className="border py-3 shadow-[0_0_20px_rgba(255,255,255,0.4)]">
                 <div className="flex items-center justify-between border-b px-6 py-0">
                     <AlertDialogTitle className="text-base font-semibold">
-                        Exit Room
+                        Leave Room
                     </AlertDialogTitle>
 
                     <AlertDialogCancel asChild>
@@ -40,39 +110,73 @@ const ExitForm = () => {
 
                 <div className="px-6 py-0">
                     <p className="text-sm text-muted-foreground">
-                        Save this code file for later or delete it permanently before leaving the room.
+                        You’re about to leave this room. Before exiting, you can save the current code for future reference or permanently delete it.
                     </p>
                 </div>
 
                 <div className="space-y-4 border-t px-6 py-0">
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium">File Name *</label>
-                        <Input placeholder="example.tsx" />
-                    </div>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                            <FormField
+                                control={form.control}
+                                name="fileName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>File Name *</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="ex : sort-array" {...field} />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Choose a clear and descriptive name so you can easily identify this file later.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium">Description</label>
-                        <Textarea
-                            placeholder="Optional description..."
-                            className="resize-none"
-                        />
-                    </div>
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Description</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder="Add a short note about what this file contains (optional)"
+                                                className="resize-none"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Optional details to help you remember the purpose or context of this file.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <DialogFooter className="border-t px-6 py-4">
+                                <div className="flex w-full items-center justify-end gap-2">
+                                    <Button className="bg-red-600 hover:bg-red-700 cursor-pointer text-white">
+                                        Delete File & Exit
+                                    </Button>
+
+                                    <Button
+                                        className="bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                                        type="submit"
+                                    >
+                                        Save File & Exit
+                                    </Button>
+                                </div>
+                            </DialogFooter>
+                        </form>
+                    </Form>
                 </div>
-
-                <DialogFooter className="border-t  px-6 py-4">
-                    <div className="flex w-full items-center justify-end gap-2">
-                        <Button className="bg-red-600 hover:bg-red-700 cursor-pointer text-white">
-                            Delete & Exit
-                        </Button>
-
-                        <Button className="bg-green-600 text-white hover:bg-green-700 cursor-pointer">
-                            Save & Exit
-                        </Button>
-                    </div>
-                </DialogFooter>
             </AlertDialogContent>
         </AlertDialog>
+
     )
 };
 
 export default ExitForm;
+

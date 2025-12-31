@@ -16,7 +16,7 @@ type Props = {
 export function EditorShell({ username, roomId }: Props) {
     const [copied, setCopied] = useState(false);
     const [showOutput, setShowOutput] = useState(false);
-
+    
     const {
         ref,
         view,

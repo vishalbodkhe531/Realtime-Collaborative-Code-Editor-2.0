@@ -5,6 +5,7 @@ import "@/app/styles/globals.css"
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { UserContextProvider } from "@/context/userContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -82,7 +83,9 @@ export default function RootLayout({
             defaultTheme="dark"
             enableSystem
           >
-            {children}
+            <UserContextProvider>
+              {children}
+            </UserContextProvider>
           </ThemeProvider>
         </Providers>
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar />

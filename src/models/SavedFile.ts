@@ -21,7 +21,7 @@ const SavedFileSchema = new Schema<ISavedFile>(
         owner: {
             type: Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: true, 
         },  
     },
     { timestamps: true }
