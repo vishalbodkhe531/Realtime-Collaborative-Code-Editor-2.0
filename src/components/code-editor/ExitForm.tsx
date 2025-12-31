@@ -1,3 +1,5 @@
+"use client"
+
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -20,17 +22,21 @@ import { DialogFooter } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 
+import { useUserContext } from "@/context/userContext";
 import { exitFormSchema, exitFormSchemaType } from "@/validation/formsValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useUserContext } from "@/context/userContext";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { saveFile } from "@/hooks/useExitRoom";
+import { useState } from "react";
 
 
 const ExitForm = () => {
     const { username, roomId, code, language, resetRoom } = useUserContext();
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const form = useForm<exitFormSchemaType>({
         resolver: zodResolver(exitFormSchema),
@@ -40,11 +46,14 @@ const ExitForm = () => {
         },
     })
 
+
     const onSubmit = async (data: exitFormSchemaType) => {
         if (!roomId || !username) {
             toast.error("Missing room data");
             return;
         }
+
+        setIsLoading(true);
 
         try {
             const payload = {
@@ -56,31 +65,21 @@ const ExitForm = () => {
                 username,
             };
 
-            const res = await fetch("/api/saveFile", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
+            const result = await saveFile(payload);
 
-            const result = await res.json();
-
-            if (!res.ok || !result.success) {
+            if (!result?.success) {
                 toast.error("Failed to save file");
                 return;
             }
 
             toast.success("File saved successfully");
             resetRoom();
-
             router.push("/dashboard");
 
         } catch (error) {
             toast.error("Network error");
         }
     };
-
 
 
     return (
@@ -157,15 +156,17 @@ const ExitForm = () => {
 
                             <DialogFooter className="border-t px-6 py-4">
                                 <div className="flex w-full items-center justify-end gap-2">
-                                    <Button className="bg-red-600 hover:bg-red-700 cursor-pointer text-white">
-                                        Delete File & Exit
+                                    <Button type="button" disabled={isLoading} onClick={() => router.push("/dashboard")} className="bg-red-600 hover:bg-red-700 cursor-pointer text-white"
+                                    >
+                                        {isLoading ? "Processing..." : "Delete File & Exit"}
                                     </Button>
 
                                     <Button
-                                        className="bg-green-600 text-white hover:bg-green-700 cursor-pointer"
                                         type="submit"
+                                        disabled={isLoading}
+                                        className="bg-green-600 text-white hover:bg-green-700 cursor-pointer disabled:opacity-60"
                                     >
-                                        Save File & Exit
+                                        {isLoading ? "Saving..." : "Save File & Exit"}
                                     </Button>
                                 </div>
                             </DialogFooter>
@@ -173,7 +174,7 @@ const ExitForm = () => {
                     </Form>
                 </div>
             </AlertDialogContent>
-        </AlertDialog>
+        </AlertDialog >
 
     )
 };
