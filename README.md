@@ -102,3 +102,10 @@ This live code editor demonstrates how modern web technologies can be combined t
 
 ---
 
+
+
+<!-- “One of my main projects is a live collaborative code editor. In this project, multiple users can join the same editor and write or edit code together in real time. If one person makes a change, everyone can see it instantly.
+
+I built this project using Next.js and React, and I used CodeMirror for the code editor. For real-time collaboration, I used Liveblocks and Y.js, which work similar to Socket.io. The editor supports multiple programming languages like JavaScript, Python, C++, and Java.
+
+I also added a feature to run code using an API, and the project data is stored in MongoDB. The application is deployed on Vercel. This project is mainly useful for pair programming, online learning, and team collaboration.” -->

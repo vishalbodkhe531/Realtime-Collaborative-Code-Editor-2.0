@@ -1,11 +1,12 @@
-import { Providers } from "@/utils/Providers";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "@/app/styles/globals.css"
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import "@/app/styles/globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { UserContextProvider } from "@/context/userContext";
+import AuthProvider from "@/utils/NextAuthProvider";
+import { LiveblockProvider } from "@/utils/Providers";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -77,17 +78,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased select-none`}
       >
-        <Providers>
+        <LiveblockProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem
           >
             <UserContextProvider>
-              {children}
+              <AuthProvider>
+                {children}
+              </AuthProvider>
             </UserContextProvider>
           </ThemeProvider>
-        </Providers>
+        </LiveblockProvider>
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       </body>
     </html>
