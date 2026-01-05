@@ -2,34 +2,62 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Github } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage
+} from "@/components/ui/form";
+import { SignInFormSchema, SignInFormType } from "@/validation/formsValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+
 const Login = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const route = useRouter();
+    const router = useRouter();
 
-    const handleCredentialsLogin = async () => {
-        setLoading(true);
-
-        await signIn("credentials", {
-            email,
-            password,
-            callbackUrl: "/",
-        });
-
-        setLoading(false);
-    };
+    const form = useForm<SignInFormType>({
+        resolver: zodResolver(SignInFormSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+    })
 
     const handleCreateAccount = () => {
         setLoading(true);
-        route.push("/sign-up");
+        router.push("/sign-up");
     };
+
+    async function onSubmit(values: SignInFormType) {
+        try {
+            setLoading(true);
+
+            const res = await signIn("credentials", {
+                email: values.email,
+                password: values.password,
+                redirect: false,
+            });
+
+            if (res?.error) {
+                return toast.error(res.error);
+            }
+            toast.success("Signed in successfully");
+            router.push("/dashboard");
+        } catch (err: any) {
+            toast.error(err.message || "Something went wrong during sign in.");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted px-4">
@@ -43,46 +71,64 @@ const Login = () => {
                     </p>
                 </div>
 
-                <div className="space-y-4">
-                    <div className="space-y-1">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            placeholder="you@example.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="email"
+                                            placeholder="you@example.com"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
                         />
-                    </div>
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            placeholder="••••••••"
+                                            {...field}
+                                        />
+                                    </FormControl>
 
-                    <div className="space-y-1">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                                    <FormMessage />
+                                </FormItem>
+                            )}
                         />
-                    </div>
+                        <div className="space-y-4">
+                            <Button
+                                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+                                // onClick={handleCredentialsLogin}
+                                type="submit"
+                                disabled={loading}
+                            >
+                                {loading ? "Signing in..." : "Sign in"}
+                            </Button>
 
-                    <Button
-                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
-                        onClick={handleCredentialsLogin}
-                        disabled={loading}
-                    >
-                        {loading ? "Signing in..." : "Sign in"}
-                    </Button>
-
-                    <Button
-                        variant="outline"
-                        className="w-full border-primary cursor-pointer text-primary hover:bg-primary/10"
-                        disabled={loading}
-                        onClick={handleCreateAccount}
-                    >
-                        Create new account
-                    </Button>
-                </div>
+                            <Button
+                                variant="outline"
+                                className="w-full border-primary cursor-pointer text-primary hover:bg-primary/10"
+                                disabled={loading}
+                                onClick={handleCreateAccount}
+                            >
+                                Create new account
+                            </Button>
+                        </div>
+                    </form>
+                </Form>
 
                 <div className="my-6 flex items-center gap-3">
                     <div className="h-px flex-1 bg-border" />
@@ -98,7 +144,6 @@ const Login = () => {
                     Continue with GitHub
                 </Button>
 
-                {/* Footer */}
                 <p className="mt-6 text-center text-xs text-muted-foreground">
                     By continuing, you agree to our
                     <span className="underline underline-offset-4">Terms of Service</span>{" "}

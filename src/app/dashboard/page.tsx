@@ -12,9 +12,31 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
+import { signOut, useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { toast } from "react-toastify"
 import JoinForm from "../join-form/page"
 
 export default function Dashboard() {
+
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { status } = useSession();
+
+  const isAuthenticated = status === "authenticated";
+
+  if (status === "loading") return null;
+
+  const handleLogin = () => {
+    setLoading(true);
+    router.push("/sign-in");
+  }
+
+  const handleLogout = async () => {
+    toast.success("Logged out successfully");
+    await signOut({ callbackUrl: "/sign-in" });
+  };
 
   return (
     <div className="min-h-screen bg-background p-6 text-foreground ">
@@ -34,12 +56,40 @@ export default function Dashboard() {
             </div>
 
             <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button size="lg" className="rounded-2xl cursor-pointer">
-                  <Plus className="mr-2 h-5 w-5" />
-                  Create Room
+              {isAuthenticated ? (
+                <div className="flex items-center gap-3">
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="lg"
+                      className="rounded-2xl cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
+                      disabled={loading}
+                    >
+                      <Plus className="mr-2 h-5 w-5" />
+                      Create Room
+                    </Button>
+                  </AlertDialogTrigger>
+
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="rounded-2xl cursor-pointer border-destructive text-destructive hover:bg-destructive/10"
+                    onClick={handleLogout}
+                    disabled={loading}
+                  >
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  size="lg"
+                  className="rounded-2xl cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={handleLogin}
+                  disabled={loading}
+                >
+                  <LogIn className="mr-2 h-5 w-5" />
+                  Login
                 </Button>
-              </AlertDialogTrigger>
+              )}
 
               <AlertDialogContent className="border py-12 shadow-[0_0_20px_rgba(255,255,255,0.4)]">
                 <AlertDialogTitle className="text-center text-lg font-semibold">

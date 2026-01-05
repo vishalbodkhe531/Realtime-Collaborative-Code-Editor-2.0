@@ -5,13 +5,32 @@ export interface IUser extends Document {
     roomId: string;
     savedFiles: Types.ObjectId[];
     joinedAt: Date;
+    name: string;
+    email: string;
+    password: string;
 }
 
 const UserSchema = new Schema<IUser>({
-    username: { type: String, required: true },
-    roomId: { type: String, required: true },
+    username: String,
+    roomId: String,
     savedFiles: [{ type: Types.ObjectId, ref: "SavedFile" }],
     joinedAt: { type: Date, default: Date.now },
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
 });
 
 export default models.User || model<IUser>("User", UserSchema);

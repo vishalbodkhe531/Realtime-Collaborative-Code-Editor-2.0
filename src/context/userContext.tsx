@@ -1,18 +1,16 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 
 type UserContextType = {
     username: string | null;
     roomId: string | null;
     code: string;
     language: string;
-
     setUsername: (username: string | null) => void;
     setRoomId: (roomId: string | null) => void;
     setCode: (code: string) => void;
     setLangInContext: (language: string) => void;
-
     resetRoom: () => void;
 };
 
@@ -29,19 +27,19 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
         setUsername(null);
         setRoomId(null);
     };
-    
+
 
     return (
         <UserContext.Provider
             value={{
                 username,
+                setUsername,
                 roomId,
+                setRoomId,
                 code,
                 language,
-                setUsername,
-                setRoomId,
-                setCode,
                 setLangInContext,
+                setCode,
                 resetRoom,
             }}
         >
