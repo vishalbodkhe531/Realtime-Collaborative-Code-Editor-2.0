@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
-import { signUpSchema } from "@/validation/formsValidation";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
+import { signUpSchema } from "@/validation/formsValidation";
+import bcrypt from "bcrypt";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try {

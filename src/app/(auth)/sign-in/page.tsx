@@ -51,13 +51,19 @@ const Login = () => {
                 return toast.error(res.error);
             }
             toast.success("Signed in successfully");
-            router.push("/dashboard");
+            router.push("/");
         } catch (err: any) {
             toast.error(err.message || "Something went wrong during sign in.");
         } finally {
             setLoading(false);
         }
     }
+
+    const handleSignInWithGitHub = async () => {
+        setLoading(true);
+        await signIn("github", { callbackUrl: "/" });
+        toast.success("Signed in with GitHub successfully");
+    };
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted px-4">
@@ -137,8 +143,9 @@ const Login = () => {
                 </div>
 
                 <Button
+                    onClick={handleSignInWithGitHub}
+                    disabled={loading}
                     className="w-full gap-2 bg-[#24292F] cursor-pointer text-white hover:bg-[#24292F]/90"
-                    onClick={() => signIn("github", { callbackUrl: "/" })}
                 >
                     <Github className="h-5 w-5" />
                     Continue with GitHub

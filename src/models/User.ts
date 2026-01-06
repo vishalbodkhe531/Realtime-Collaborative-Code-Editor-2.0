@@ -15,6 +15,7 @@ const UserSchema = new Schema<IUser>({
     roomId: String,
     savedFiles: [{ type: Types.ObjectId, ref: "SavedFile" }],
     joinedAt: { type: Date, default: Date.now },
+    password: String,
     name: {
         type: String,
         required: true,
@@ -26,10 +27,6 @@ const UserSchema = new Schema<IUser>({
         unique: true,
         lowercase: true,
         trim: true,
-    },
-    password: {
-        type: String,
-        required: true,
     },
 });
 

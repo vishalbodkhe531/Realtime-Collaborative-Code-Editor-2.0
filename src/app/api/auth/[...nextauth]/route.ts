@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
 
                 const user = await User.findOne({ email: credentials.email });
 
-                if (!user) {
+                if (!user || !user.password) {
                     throw new Error("Invalid email or password");
                 }
 
@@ -49,6 +49,27 @@ export const authOptions: NextAuthOptions = {
             },
         }),
     ],
+
+    callbacks: {
+        async signIn({ user, account }) {
+
+            if (account?.provider === "github") {
+                await connectDB();
+
+                const existingUser = await User.findOne({ email: user.email });
+
+                if (!existingUser) {
+                    const res = await User.create({
+                        name: user.name,
+                        email: user.email,
+                    });
+                }
+
+            }
+
+            return true;
+        },
+    },
 
     session: {
         strategy: "jwt",
