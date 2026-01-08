@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { History, LogIn, Plus, X } from "lucide-react"
 
+import Loading from "@/components/code-editor/Loading"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,20 +13,29 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
+import { getSavedfiles } from "@/hooks/useGetSavedfiles"
+import { CodeFile } from "@/types/appTypes"
 import { signOut, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
-import Loading from "@/components/code-editor/Loading"
 import JoinForm from "./join-form/page"
 
 export default function Dashboard() {
 
   const [loading, setLoading] = useState(false);
+  const [files, setFiles] = useState<CodeFile[]>([]);
   const router = useRouter();
   const { status } = useSession();
-
   const isAuthenticated = status === "authenticated";
+
+  useEffect(() => {
+    const fetchFiles = async () => {
+      const savedFiles = await getSavedfiles();
+      setFiles(savedFiles);
+    };
+    fetchFiles();
+  }, []);
 
   if (status === "loading") return <Loading />;
 
@@ -114,75 +124,85 @@ export default function Dashboard() {
         <Tabs defaultValue="rooms" className="space-y-4">
           <TabsList className="rounded-2xl bg-muted">
             <TabsTrigger value="rooms" className="cursor-pointer">My Rooms</TabsTrigger>
-            <TabsTrigger value="join" className="cursor-pointer">Join Room</TabsTrigger>
             <TabsTrigger value="history" className="cursor-pointer">History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="rooms">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((room) => (
-                <Card
-                  key={room}
-                  className="rounded-2xl border border-border bg-card shadow-sm"
-                >
-                  <CardHeader>
-                    <CardTitle>Room #{room}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Last active: 2 hours ago
-                    </p>
-                    <Button className="w-full rounded-xl">
-                      Open Editor
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+              {files.length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground">
+                  No files found. Create a file to get started.
+                </p>
+              ) : (
+                files.map((file) => (
+                  <Card
+                    key={file._id}
+                    className="rounded-2xl border border-border bg-card shadow-sm"
+                  >
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between">
+                        <span>{file.name}</span>
+                        <span className="text-xs text-muted-foreground uppercase">
+                          {file.language}
+                        </span>
+                      </CardTitle>
+                    </CardHeader>
 
-          <TabsContent value="join">
-            <Card className="max-w-md rounded-2xl border border-border bg-card">
-              <CardHeader>
-                <CardTitle>Join Existing Room</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <input
-                  placeholder="Enter Room ID"
-                  className="w-full rounded-xl border border-border bg-background px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <Button className="w-full rounded-xl">
-                  <LogIn className="mr-2 h-4 w-4" /> Join Room
-                </Button>
-              </CardContent>
-            </Card>
+                    <CardContent className="space-y-3">
+                      {file.description ? (
+                        <p className="text-sm text-muted-foreground">
+                          {file.description}
+                        </p>
+                      ) : <p className="text-sm text-muted-foreground">No Description</p>}
+
+                      <p className="text-xs text-muted-foreground">
+                        Created: {new Date(file.createdAt).toLocaleString()}
+                      </p>
+
+                      <Button className="w-full rounded-xl cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90">
+                        Open Editor
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+
+            </div>
           </TabsContent>
 
           <TabsContent value="history">
             <div className="space-y-4">
-              {[1, 2, 3, 4].map((item) => (
-                <Card
-                  key={item}
-                  className="rounded-2xl border border-border bg-card"
-                >
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div>
-                      <p className="font-medium">Room ABC{item}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Exited on 2024-06-12
-                      </p>
-                    </div>
-                    <History className="h-5 w-5 text-muted-foreground" />
-                  </CardContent>
-                </Card>
-              ))}
+              {files.length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground">
+                  No history found.
+                </p>
+              ) : (
+                files.map((file) => (
+                  <Card
+                    key={file._id}
+                    className="rounded-2xl border border-border bg-card"
+                  >
+                    <CardContent className="flex items-center justify-between p-4">
+                      <div>
+                        <p className="font-medium">
+                          {file.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Last edited on{" "}
+                          {new Date(file.updatedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+
+                      <History className="h-5 w-5 text-muted-foreground" />
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </TabsContent>
+
         </Tabs>
       </div>
     </div>
   )
 }
-
-
-

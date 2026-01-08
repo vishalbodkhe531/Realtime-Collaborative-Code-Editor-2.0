@@ -29,6 +29,9 @@ export async function POST(req: Request) {
         owner: user._id,
     });
 
+    user.savedFiles.push(savedFile._id);
+    await user.save();
+
     return NextResponse.json({
         success: true,
         fileId: savedFile._id,

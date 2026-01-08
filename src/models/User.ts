@@ -4,6 +4,11 @@ export interface IUser extends Document {
     username: string;
     roomId: string;
     savedFiles: Types.ObjectId[];
+    room: {
+        type: Types.ObjectId,
+        ref: "Room",
+        default: null,
+    };
     joinedAt: Date;
     name: string;
     email: string;
@@ -13,21 +18,20 @@ export interface IUser extends Document {
 const UserSchema = new Schema<IUser>({
     username: String,
     roomId: String,
+    room: {
+        type: Types.ObjectId,
+        ref: "Room",
+        default: null,
+    },
     savedFiles: [{ type: Types.ObjectId, ref: "SavedFile" }],
     joinedAt: { type: Date, default: Date.now },
     password: String,
-    name: {
-        type: String,
-        required: true,
-        trim: true,
-    },
+    name: String,
     email: {
         type: String,
-        required: true,
         unique: true,
-        lowercase: true,
-        trim: true,
     },
 });
+
 
 export default models.User || model<IUser>("User", UserSchema);

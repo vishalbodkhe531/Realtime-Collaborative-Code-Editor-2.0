@@ -74,7 +74,7 @@ const ExitForm = () => {
 
             toast.success("File saved successfully");
             resetRoom();
-            router.push("/dashboard");
+            router.push("/");
 
         } catch (error) {
             toast.error("Network error");
@@ -156,7 +156,7 @@ const ExitForm = () => {
 
                             <DialogFooter className="border-t px-6 py-4">
                                 <div className="flex w-full items-center justify-end gap-2">
-                                    <Button type="button" disabled={isLoading} onClick={() => router.push("/dashboard")} className="bg-red-600 hover:bg-red-700 cursor-pointer text-white"
+                                    <Button type="button" disabled={isLoading} onClick={() => router.push("/")} className="bg-red-600 hover:bg-red-700 cursor-pointer text-white"
                                     >
                                         {isLoading ? "Processing..." : "Delete File & Exit"}
                                     </Button>
