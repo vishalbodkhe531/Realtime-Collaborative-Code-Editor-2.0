@@ -1,14 +1,9 @@
 "use client";
 
+import { SidebarProps } from "@/types/appTypes";
 import { ExistingUserPanel } from "./ExistingUserPanel ";
 
 import ExitForm from "./ExitForm";
-
-interface SidebarProps {
-    roomId: string;
-    username: string;
-    onExit: () => void;
-}
 
 export function Sidebar({ roomId, username, onExit }: SidebarProps) {
     return (

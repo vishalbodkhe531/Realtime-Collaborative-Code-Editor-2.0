@@ -2,11 +2,7 @@
 
 import { Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
-
-interface EditorOutputProps {
-    output: string;
-    onClear: (isClearOtp: boolean) => void;
-}
+import { EditorOutputProps } from "@/types/appTypes";
 
 export function EditorOutput({ output, onClear }: EditorOutputProps) {
     return (

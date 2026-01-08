@@ -4,11 +4,8 @@ import * as Y from "yjs";
 import { RedoIcon, UndoIcon } from "./Icons";
 import { Button } from "../ui/button";
 
-type Props = {
-  yUndoManager: Y.UndoManager | null;
-};
 
-export function Toolbar({ yUndoManager }: Props) {
+export function Toolbar({ yUndoManager }: { yUndoManager: Y.UndoManager | null }) {
   if (!yUndoManager) return null;
 
   return (

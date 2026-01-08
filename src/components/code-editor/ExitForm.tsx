@@ -46,7 +46,6 @@ const ExitForm = () => {
         },
     })
 
-
     const onSubmit = async (data: exitFormSchemaType) => {
         if (!roomId || !username) {
             toast.error("Missing room data");

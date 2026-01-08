@@ -19,3 +19,44 @@ export type CodeFile = {
     createdAt: string;
     updatedAt: string;
 };
+
+
+//  EditorHeader component
+export interface EditorHeaderProps {
+    yUndoManager: any;
+    language: string;
+    roomId: string;
+    copied: boolean;
+    isRunning: boolean;
+    onCopy: () => void;
+    onRun: () => void;
+    onLanguageChange: (lang: string) => void;
+}
+
+export interface EditorOutputProps {
+    output: string;
+    onClear: (isClearOtp: boolean) => void;
+}
+
+export interface EditorShellProps {
+    username: string;
+    roomId: string;
+};
+
+
+export type Member = {
+    name: string;
+    picture?: string;
+    isTyping?: boolean;
+};
+
+export type AvatarsProps = {
+    currentRoomId: string;
+    currentUser: string;
+};
+
+export interface SidebarProps {
+    roomId: string;
+    username: string;
+    onExit: () => void;
+}

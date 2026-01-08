@@ -10,17 +10,8 @@ import {
 } from "@/components/ui/select";
 import { ThemeToggle } from "../ui/theme-toggle";
 import { Toolbar } from "./Toolbar";
+import { EditorHeaderProps } from "@/types/appTypes";
 
-interface EditorHeaderProps {
-    yUndoManager: any;
-    language: string;
-    roomId: string;
-    copied: boolean;
-    isRunning: boolean;
-    onCopy: () => void;
-    onRun: () => void;
-    onLanguageChange: (lang: string) => void;
-}
 
 export function EditorHeader({
     yUndoManager,

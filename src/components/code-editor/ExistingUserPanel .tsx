@@ -3,18 +3,7 @@
 import { useEffect, useState } from "react";
 import { Avatar } from "./Avatar";
 import { TypingIndicator } from "./TypingIndicator";
-
-type Member = {
-  name: string;
-  picture?: string;
-  isTyping?: boolean;
-};
-
-type AvatarsProps = {
-  currentRoomId: string;
-  currentUser: string;
-};
-
+import { AvatarsProps, Member } from "@/types/appTypes";
 
 export function ExistingUserPanel({ currentRoomId, currentUser }: AvatarsProps) {
   const [members, setMembers] = useState<Member[]>([]);

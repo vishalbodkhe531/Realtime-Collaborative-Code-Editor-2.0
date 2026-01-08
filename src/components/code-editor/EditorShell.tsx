@@ -7,16 +7,14 @@ import { EditorHeader } from "./EditorHeader";
 import { EditorOutput } from "./EditorOutput";
 import { Sidebar } from "./Sidebar";
 import { useCollaborativeEditor } from "./data/useCollaborativeEditor";
+import { EditorShellProps } from "@/types/appTypes";
 
-type Props = {
-    username: string;
-    roomId: string;
-};
 
-export function EditorShell({ username, roomId }: Props) {
+
+export function EditorShell({ username, roomId }: EditorShellProps) {
     const [copied, setCopied] = useState(false);
     const [showOutput, setShowOutput] = useState(false);
-    
+
     const {
         ref,
         view,
