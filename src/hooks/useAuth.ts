@@ -10,9 +10,5 @@ export const signUp = async (data: signUpType) => {
         body: JSON.stringify(data),
     });
 
-    if (!res.ok) {
-        throw new Error("Failed to sign up");
-    }
-
     return res.json();
 }

@@ -1,3 +1,4 @@
+import Room from "@/models/Room";
 import SavedFile from "@/models/SavedFile";
 import User from "@/models/User";
 import { NextResponse } from "next/server";
@@ -31,6 +32,11 @@ export async function POST(req: Request) {
 
     user.savedFiles.push(savedFile._id);
     await user.save();
+
+    await Room.findOneAndUpdate(
+        { roomId },
+        { $pull: { members: username } }
+    );
 
     return NextResponse.json({
         success: true,

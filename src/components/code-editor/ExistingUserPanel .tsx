@@ -14,6 +14,7 @@ export function ExistingUserPanel({ currentRoomId, currentUser }: AvatarsProps) 
     const fetchMembers = async () => {
       const res = await fetch(`/api/users?roomId=${currentRoomId}`);
       const data = await res.json();
+
       const mapped = (data.members || []).map((name: string) => ({
         name,
         picture: `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
