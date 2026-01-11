@@ -1,14 +1,11 @@
 "use client";
-
 import { useState } from "react";
 import { useRoomActions } from "../../hooks/useRoomActions";
-
 import { EditorHeader } from "./EditorHeader";
 import { EditorOutput } from "./EditorOutput";
 import { Sidebar } from "./Sidebar";
 import { useCollaborativeEditor } from "./data/useCollaborativeEditor";
 import { EditorShellProps } from "@/types/appTypes";
-
 
 
 export function EditorShell({ username, roomId }: EditorShellProps) {
@@ -35,7 +32,6 @@ export function EditorShell({ username, roomId }: EditorShellProps) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
     };
-
 
     const handleRunWithOutput = async () => {
         setShowOutput(true);

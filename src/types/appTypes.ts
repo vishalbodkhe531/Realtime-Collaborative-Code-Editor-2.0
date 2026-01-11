@@ -60,3 +60,10 @@ export interface SidebarProps {
     username: string;
     onExit: () => void;
 }
+
+
+export type SavedFileProps = {
+    code: string;
+    language: string;
+    readOnly?: boolean;
+};

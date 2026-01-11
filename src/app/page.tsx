@@ -159,7 +159,8 @@ export default function Dashboard() {
                         Created: {new Date(file.createdAt).toLocaleString()}
                       </p>
 
-                      <Button className="w-full rounded-xl cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button className="w-full rounded-xl cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => router.push(`/editor/saved-editor/${file._id}`)}
+                      >
                         Open Editor
                       </Button>
                     </CardContent>
